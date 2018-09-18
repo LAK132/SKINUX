@@ -3,18 +3,25 @@ from sys import platform
 from ctypes import sizeof, c_void_p, c_char_p
 import os
 
-clibdir = "./out/debug/x86/skinux{}".format(".dll" if platform=="win32" else ".so")
+os.chdir("out/debug")
+if platform=="win32":
+    os.chdir("x86")
+
+clibdir = "libSkinux.{}".format("dll" if platform=="win32" else "so")
+
 clib = CLib(clibdir, dict(
-    startDrawThread=[None, []],
-    stopDrawThread=[None, []],
+    init=[None, []],
+    shutdown=[None, []],
+    beginOpenGLAccess=[None, []],
+    endOpenGLAccess=[None, []],
     beginUpdate=[None, []],
     endUpdate=[None, []]
 ))
 
-clib.startDrawThread()
+clib.init()
 
 clib.beginUpdate()
 
 clib.endUpdate()
 
-clib.stopDrawThread()
+clib.shutdown()

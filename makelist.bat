@@ -5,8 +5,8 @@ set APP=libSkinux.dll
 set OUTDIR=out
 set BINDIR=bin
 
-set LIBDIR=
-set LIBS=
+set LIBDIR=lib
+set LIBS=SDL2main.lib SDL2.lib
 
 set COMPOPT=/nologo /EHa /MD /MP /bigobj
 set LINKOPT=/nologo /DLL

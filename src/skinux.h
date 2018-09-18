@@ -7,23 +7,30 @@ using std::thread;
 #include <atomic>
 using std::atomic_bool;
 
+#include <imgui/imgui.h>
+// #include <imgui/imgui_impl_sdl_gl3.h>
+
+#define SDL_MAIN_HANDLED
+#include <SDL/SDL.h>
+#include <GL/gl3w.h>
+
 #include "lak/pyexport.h"
 #include "lak/queue.h"
 
 #ifndef SKINUX_H
 #define SKINUX_H
 
+PY_EXPORT void init();
+
+PY_EXPORT void shutdown();
+
 //
-// draw thread control
+// opengl access control
 //
 
-extern thread drawThread;
+PY_EXPORT void beginOpenGLAccess();
 
-// start the draw thread
-PY_EXPORT void startDrawThread();
-
-// stop the draw thread
-PY_EXPORT void stopDrawThread();
+PY_EXPORT void endOpenGLAccess();
 
 //
 // update control
