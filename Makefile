@@ -4,7 +4,7 @@ CPPVER = c++14
 
 APP = libSkinux.so
 
-COMPOPT = -ldl -pthread -fpic
+COMPOPT = -ldl -pthread -fpic -lSDL2
 LINKOPT = -shared
 
 # APP = skinux.a
@@ -28,7 +28,7 @@ SOURCES = src
 
 src_SRC = ./src
 src_OBJ = skinux.cpp 
-src_INC = include
+src_INC = include /usr/include/SDL2
 
 # -------------------
 # Start build script:
@@ -37,13 +37,13 @@ ALL_OBJ = $(foreach src,$(SOURCES),$(foreach obj,$($(src)_OBJ),$(BINDIR)/$(src)$
 
 .PHONY: debug
 debug: $(foreach obj,$(ALL_OBJ),debug-$(obj))
-	$(call LINK_TEMPLATE,$(LINKOPT) $(DBGLINKOPT))
+	$(call LINK_TEMPLATE,$(LINKOPT) $(DBGLINKOPT),debug)
 
 release: $(foreach obj,$(ALL_OBJ),release-$(obj))
-	$(call LINK_TEMPLATE,$(LINKOPT) $(RELLINKOPT))
+	$(call LINK_TEMPLATE,$(LINKOPT) $(RELLINKOPT),release)
 
 define LINK_TEMPLATE =
-$(CXX) -std=$(CPPVER) -o $(OUTDIR)/$(APP) $(ALL_OBJ) $(foreach libdir,$(LIBDIR),-L$(libdir)) $(foreach lib,$(LIBS),-l$(lib)) $(COMPOPT) $(1)
+$(CXX) -std=$(CPPVER) -o $(OUTDIR)/$(2)/$(APP) $(ALL_OBJ) $(foreach libdir,$(LIBDIR),-L$(libdir)) $(foreach lib,$(LIBS),-l$(lib)) $(COMPOPT) $(1)
 endef
 
 define COMPILE_TEMPLATE =

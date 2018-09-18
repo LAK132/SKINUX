@@ -21,7 +21,7 @@ set SOURCES=src
 
 set src_SRC=src
 set src_OBJ=skinux.cpp
-set src_INC=include
+set src_INC=include include/SDL
 
 if not "%1"=="x64" if not "%1"=="x86" goto :eof
 

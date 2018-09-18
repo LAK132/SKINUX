@@ -11,7 +11,8 @@ using std::atomic_bool;
 // #include <imgui/imgui_impl_sdl_gl3.h>
 
 #define SDL_MAIN_HANDLED
-#include <SDL/SDL.h>
+#include <SDL.h>
+
 #include <GL/gl3w.h>
 
 #include "lak/pyexport.h"
