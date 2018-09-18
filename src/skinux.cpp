@@ -9,6 +9,8 @@ extern "C" {
 #include <GL/gl3w.c>
 }
 
+#include "pygui.cpp"
+
 #include "lak/queue.cpp"
 
 SDL_Window* window;
@@ -24,8 +26,6 @@ void update()
         ImGui_ImplSdlGL3_ProcessEvent(&event);
     }
     ImGui::NewFrame();
-
-    ImGui::Render();
 }
 
 void draw()
@@ -94,6 +94,7 @@ void init()
 
     draw();
     update();
+    ImGui::Render();
 
     running = true;
     drawThread = thread(drawLoop);
@@ -139,5 +140,6 @@ void beginUpdate()
 
 void endUpdate()
 {
+    ImGui::Render();
     updateRunning.reset();
 }
