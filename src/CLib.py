@@ -1,3 +1,4 @@
+import sys
 from ctypes import CDLL
 import os
 from ctypes import CDLL
@@ -44,8 +45,6 @@ class CLib(object):
     def load(self, filename):
         self._free()
         self._tempfile = NamedTemporaryFile(delete=False, suffix=".ctypelib")
-
-
         libfile = open(filename, 'rb')
         while True:
             b = libfile.read(2048)
@@ -60,3 +59,9 @@ class CLib(object):
             if hasattr(self._lib, k):
                 getattr(self._lib, k).restype = self.functypes[k][0]
                 getattr(self._lib, k).argtype = self.functypes[k][1]
+
+    def cleanup(self):
+        try:
+            self._free()
+        except:
+            sys.stderr.write('Failed to delete temp lib')

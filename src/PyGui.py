@@ -1,4 +1,7 @@
+from contextlib import contextmanager
 from ctypes import byref, CFUNCTYPE, POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_double, c_bool, c_ushort, Structure
+
+from CLib import CLib
 
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
@@ -198,11 +201,58 @@ class ImGuiIO(Structure):
         ("NavInputsDownDurationPrev", c_float * ImGuiNavInput.COUNT.value)
     ]
 
+
+
 class PyGui(object):
     _lib = None
-    def __init__(self, clib):
+    def __init__(self, clibdir):
+        clib = CLib(str(clibdir), dict(
+            init=[None, []],
+            stop=[None, []],
+            beginOpenGLAccess=[None, []],
+            endOpenGLAccess=[None, []],
+            beginUpdate=[c_bool, []],
+            endUpdate=[None, []],
+
+            ImGui_Begin=[c_bool, [c_char_p, c_bool_p, c_int]],
+            ImGui_End=[None, []],
+            ImGui_BeginChild=[c_bool, [c_char_p, ImVec2, c_bool, c_int]],
+            ImGui_EndChild=[None, []],
+            ImGui_Separator=[None, []],
+            ImGui_SameLine=[None, [c_float, c_float]],
+            ImGui_NewLine=[None, []],
+            ImGui_Spacing=[None, []],
+            ImGui_Dummy=[None, [ImVec2]],
+            ImGui_Indent=[None, [c_float]],
+            ImGui_Unindent=[None, [c_float]],
+            ImGui_BeginGroup=[None, []],
+            ImGui_EndGroup=[None, []],
+            ImGui_TextUnformatted=[None, [c_char_p, c_char_p]],
+            ImGui_Button=[c_bool, [c_char_p, ImVec2]],
+            ImGui_SmallButton=[c_bool, [c_char_p]],
+            ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
+            ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]
+        ))
         self._lib = clib
-    
+        self.running = False
+
+    def __enter__(self):
+        self._lib.init()
+        self.running = True
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._lib.stop()
+        del self._lib
+        print('Cleaned temp lib')
+
+    @contextmanager
+    def update_app(self):
+        try:
+            yield self._lib.beginUpdate()
+        finally:
+            self._lib.endUpdate()
+
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
         rtn = self._lib.ImGui_Begin(name.encode('ascii'), byref(p_open), flags)
