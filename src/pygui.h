@@ -25,7 +25,7 @@ vec4 toCVec4(ImVec4 &&vec);
 PY_EXPORT bool ImGui_Begin(const char* name, bool* p_open, ImGuiWindowFlags flags);
 PY_EXPORT void ImGui_End();
 PY_EXPORT bool ImGui_BeginChild(const char* str_id, ImVec2 size, bool border, ImGuiWindowFlags flags);
-PY_EXPORT void ImGui_EndChid();
+PY_EXPORT void ImGui_EndChild();
 
 PY_EXPORT bool ImGui_IsWindowAppearing();
 PY_EXPORT bool ImGui_IsWindowCollapsed();

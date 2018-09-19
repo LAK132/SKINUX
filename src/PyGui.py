@@ -241,8 +241,19 @@ class PyGui(object):
         try:
             yield self.begin_child(name, size, border, flags)
         finally:
+            print('End child')
             self.end_child()
 
+    @contextmanager
+    def new_window(self, name, open=True, flags=c_int(0)):
+        try:
+            created,open = self.begin(name,open,flags)
+            self.running = created
+            yield open
+        except Exception as ex:
+            print(ex)
+        finally:
+            self.end()
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
         rtn = self._lib.ImGui_Begin(name.encode('utf-8'), byref(p_open), flags)

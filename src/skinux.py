@@ -61,7 +61,7 @@ a = False
 with pygui as gui:
     while gui.running:
         with gui.update_app():
-            if gui.begin("SKINUX"):
+            with gui.new_window("SKINUX"):
                 if gui.button("Exit", ImVec2(100, 100)):
                     gui.running = False
                 gui.separator()
@@ -70,6 +70,6 @@ with pygui as gui:
                     print('test')
 
                 if a:
-                    gui.text('Test text')
-
-                gui.end()
+                    with gui.new_child('Scrolling') as success:
+                        if success:
+                            gui.text('Test text')

@@ -32,10 +32,11 @@ void ImGui_End()
 
 bool ImGui_BeginChild(const char* str_id, vec2 size, bool border, ImGuiWindowFlags flags)
 {
+//BeginChild(const char* str_id, const ImVec2& size = ImVec2(0,0), bool border = false, ImGuiWindowFlags flags = 0);
     return BeginChild(str_id, ImVec2(size.x, size.y), border, flags);
 }
 
-void ImGui_EndChid()
+void ImGui_EndChild()
 {
     EndChild();
 }
