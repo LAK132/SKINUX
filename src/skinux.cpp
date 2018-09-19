@@ -18,14 +18,22 @@ SDL_GLContext context;
 size_t screenWidth = 1280;
 size_t screenHeight = 720;
 
-void update()
+bool update()
 {
+    bool rtn = true;
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
+        switch(event.type)
+        {
+            case SDL_QUIT: {
+                rtn = false;
+            }
+        }
         ImGui_ImplSdlGL3_ProcessEvent(&event);
     }
     ImGui::NewFrame();
+    return rtn;
 }
 
 void draw()
@@ -84,6 +92,19 @@ void init()
 
     gl3wInit();
 
+    #ifndef NDEBUG
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback((GLDEBUGPROC)[](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+    {
+        cout << std::ios::hex << "GL CALLBACK: " 
+            << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR ** type = 0x" : "type = 0x") << type 
+            << ", severity = 0x" << severity
+            << ", message = " << endl << message << endl << endl;
+    }, 0);
+    #else
+    glDisable(GL_DEBUG_OUTPUT);
+    #endif
+
     ImGui::CreateContext();
     ImGui_ImplSdlGL3_Init(window);
     ImGui::StyleColorsDark();
@@ -132,10 +153,10 @@ void endOpenGLAccess()
 
 lak::ticket_t updateRunning;
 
-void beginUpdate()
+bool beginUpdate()
 {
     updateRunning = drawLock.lock();
-    update();
+    return update();
 }
 
 void endUpdate()

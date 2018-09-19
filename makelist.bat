@@ -8,7 +8,7 @@ set BINDIR=bin
 set LIBDIR=lib
 set LIBS=SDL2main.lib SDL2.lib
 
-set COMPOPT=/nologo /EHa /MD /MP /bigobj
+set COMPOPT=/nologo /EHa /MD /MP /bigobj /W2
 set LINKOPT=/nologo /DLL
 
 set DBGCOMPOPT=/Zi

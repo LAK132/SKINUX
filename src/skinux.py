@@ -1,5 +1,6 @@
 from CLib import CLib
 from PyGui import PyGui
+from contextlib import contextmanager
 from sys import platform
 from ctypes import POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_bool
 import os
@@ -18,7 +19,7 @@ clib = CLib(clibdir, dict(
     shutdown=[None, []],
     beginOpenGLAccess=[None, []],
     endOpenGLAccess=[None, []],
-    beginUpdate=[None, []],
+    beginUpdate=[c_bool, []],
     endUpdate=[None, []],
 
     ImGui_Begin=[c_bool, [c_char_p, c_bool_p, c_int]],
@@ -43,16 +44,26 @@ clib = CLib(clibdir, dict(
 
 pygui = PyGui(clib)
 
-running = True
+@contextmanager
+def graphicsThread():
+    try:
+        clib.init()
+        yield True
+    finally:
+        clib.shutdown()
 
-clib.init()
+@contextmanager
+def graphicsUpdate():
+    try:
+        yield clib.beginUpdate()
+    finally:
+        clib.endUpdate()
 
-while running:
-    clib.beginUpdate()
-    if pygui.begin("SKINUX"):
-        if pygui.button("Exit"):
-            running = False
-        pygui.end()
-    clib.endUpdate()
-
-clib.shutdown()
+with graphicsThread() as running:
+    while running:
+        with graphicsUpdate() as cont:
+            running = cont
+            # if pygui.begin("SKINUX"):
+            #     if pygui.button("Exit"):
+            #         clib.stop
+            #     pygui.end()

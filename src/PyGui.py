@@ -11,8 +11,7 @@ class PyGui(object):
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
         rtn = self._lib.ImGui_Begin(name, byref(p_open), flags)
-        open = p_open
-        return rtn
+        return rtn, p_open.value
 
     def end(self):
         self._lib.ImGui_End()

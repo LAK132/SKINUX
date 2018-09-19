@@ -5,6 +5,7 @@ using std::endl;
 #include <thread>
 using std::thread;
 #include <atomic>
+using std::atomic;
 using std::atomic_bool;
 
 #include <imgui/imgui.h>
@@ -17,6 +18,7 @@ using std::atomic_bool;
 
 #include "lak/pyexport.h"
 #include "lak/queue.h"
+#include "lak/ldebug.h"
 
 #ifndef SKINUX_H
 #define SKINUX_H
@@ -38,7 +40,7 @@ PY_EXPORT void endOpenGLAccess();
 //
 
 // block until the update thread is active
-PY_EXPORT void beginUpdate();
+PY_EXPORT bool beginUpdate();
 
 // yield the update thread
 PY_EXPORT void endUpdate();

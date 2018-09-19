@@ -12,7 +12,7 @@ void ImGui_End()
 
 bool ImGui_BeginChild(const char* str_id, float width, float height, bool border, ImGuiWindowFlags flags)
 {
-    ImGui::BeginChild(str_id, ImVec2(width, height), border, flags);
+    return ImGui::BeginChild(str_id, ImVec2(width, height), border, flags);
 }
 
 void ImGui_EndChid()
@@ -37,7 +37,7 @@ bool ImGui_IsWindowFocused(ImGuiFocusedFlags flags)
 
 bool ImGui_IsWindowHovered(ImGuiHoveredFlags flags)
 {
-    ImGui::IsWindowHovered(flags);
+    return ImGui::IsWindowHovered(flags);
 }
 
 void ImGui_Separator()

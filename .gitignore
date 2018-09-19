@@ -1,5 +1,7 @@
 bin
 out
+.vscode
+.vs
 *.pdb
 __pycache__
 genmake.py
