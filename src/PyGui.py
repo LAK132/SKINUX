@@ -241,7 +241,6 @@ class PyGui(object):
         try:
             yield self.begin_child(name, size, border, flags)
         finally:
-            print('End child')
             self.end_child()
 
     @contextmanager
@@ -250,8 +249,6 @@ class PyGui(object):
             created,open = self.begin(name,open,flags)
             self.running = created
             yield open
-        except Exception as ex:
-            print(ex)
         finally:
             self.end()
     def begin(self, name, open=True, flags=c_int(0)):
