@@ -69,11 +69,6 @@ with pygui as gui:
                     print('test')
 
                 if a:
-                    gui.begin_child('Scrolling')
-                    gui.button('test')
-                    gui.end_child()
-                    # with gui.new_child('Scrolling'):
-                    #     if pygui.button("Button {}".format(1)):
-                    #         a = False
+                    gui.text('Test text')
 
                 gui.end()
