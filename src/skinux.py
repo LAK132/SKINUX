@@ -53,7 +53,8 @@ clib = CLib(str(clib_dir), dict(
     ImGui_Button=[c_bool, [c_char_p, ImVec2]],
     ImGui_SmallButton=[c_bool, [c_char_p]],
     ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
-    ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]))
+    ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]
+))
 
 pygui = PyGui(clib)
 a = False
