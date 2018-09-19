@@ -1,8 +1,8 @@
-from sys import platform
-from ctypes import cdll, CDLL
-from ctypes import sizeof, c_void_p, c_char_p
-from tempfile import NamedTemporaryFile
+from ctypes import CDLL
 import os
+from ctypes import CDLL
+from tempfile import NamedTemporaryFile
+
 
 class CLib(object):
     _tempfile = None
@@ -10,7 +10,8 @@ class CLib(object):
     import _ctypes
     _libclose = getattr(_ctypes, 'FreeLibrary', getattr(_ctypes, 'dlclose', None))
     functypes = dict()
-    def __init__(self, filename = None, functypes = None):
+
+    def __init__(self, filename=None, functypes=None):
         if functypes != None:
             self.functypes = functypes
         if filename != None:
@@ -36,6 +37,7 @@ class CLib(object):
             del self._lib
             if self._libclose != None: self._libclose(handle)
         if self._tempfile != None:
+            self._tempfile.close()
             os.remove(self._tempfile.name)
 
     def load(self, filename):
@@ -44,8 +46,10 @@ class CLib(object):
         libfile = open(filename, 'rb')
         while True:
             b = libfile.read(2048)
-            if b: self._tempfile.write(b)
-            else: break
+            if b:
+                self._tempfile.write(b)
+            else:
+                break
         libfile.close()
         self._tempfile.close()
         self._lib = CDLL(self._tempfile.name)

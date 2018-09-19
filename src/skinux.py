@@ -1,19 +1,25 @@
+import os
+import platform
+from contextlib import contextmanager
+from ctypes import POINTER, c_int, c_char_p, c_float, c_bool
+from pathlib import Path
 from CLib import CLib
 from PyGui import PyGui, ImGuiDir
-from contextlib import contextmanager
-from sys import platform
-from ctypes import POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_bool
-import os
 
+bitness, os_type = platform.architecture()
+windows = os_type == "WindowsPE"
+lib_bitness = 'x86' if bitness == '32bit' else 'x64'
+debug = True
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
+lib = Path('./out')
+if debug:
+    lib /='debug'
 
-os.chdir("../out/debug")
-if platform=="win32":
-    os.chdir("x86")
-
-clibdir = "libSkinux.{}".format("dll" if platform=="win32" else "so")
-
+if windows:
+    lib/=lib_bitness
+clibdir = (lib/"libSkinux").with_suffix(".dll" if windows else ".so").absolute()
+print('Loading {}'.format(clibdir))
 clib = CLib(clibdir, dict(
     init=[None, []],
     stop=[None, []],
@@ -44,6 +50,7 @@ clib = CLib(clibdir, dict(
 
 pygui = PyGui(clib)
 
+
 @contextmanager
 def graphicsThread():
     try:
@@ -52,12 +59,14 @@ def graphicsThread():
     finally:
         clib.stop()
 
+
 @contextmanager
 def graphicsUpdate():
     try:
         yield clib.beginUpdate()
     finally:
         clib.endUpdate()
+
 
 with graphicsThread() as running:
     while running:
@@ -66,7 +75,7 @@ with graphicsThread() as running:
             if pygui.begin("SKINUX"):
                 if pygui.button("Exit"):
                     running = False
-                if pygui.arrow_button('Test',ImGuiDir.Right):
+                if pygui.arrow_button('Test', ImGuiDir.Right):
                     print('test')
                     pass
                 pygui.end()
