@@ -6,7 +6,7 @@ import platform
 from pathlib import Path
 from CLib import CLib
 from PyGui import *
-from PyGui import PyGui, ImGuiDir
+from PyGui import PyGui
 
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
@@ -51,12 +51,22 @@ clib = CLib(str(clib_dir), dict(
     ImGui_EndGroup=[None, []],
     ImGui_TextUnformatted=[None, [c_char_p, c_char_p]],
     ImGui_Text=[None, [c_char_p]],
+    ImGui_InputText=[None, [c_char_p, c_char_p, c_size_t, c_int, c_void_p, c_void_p]],
     ImGui_Button=[c_bool, [c_char_p, ImVec2]],
     ImGui_SmallButton=[c_bool, [c_char_p]],
     ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
     ImGui_ArrowButton=[c_bool, [c_char_p, c_int]],
     ImGui_GetIO=[POINTER(ImGuiIO), []]
 ))
+
+
+def test(event):
+    print(event.EventFlags,event.Flags)
+    if event.EventKey != 21 :
+        print(event.EventChar, event.EventKey, event.Buf,event.EventFlags)
+        print(event.EventKey, chr(event.EventKey))
+        return 0
+    return 1
 
 pygui = PyGui(clib)
 a = False
@@ -74,5 +84,5 @@ with pygui as gui:
                 if a:
                     with gui.new_child('') as success:
                         if success:
-                            for _ in range(16):
-                                gui.bullet()
+                            if gui.input_text('test', callback=test):
+                                print('yay')

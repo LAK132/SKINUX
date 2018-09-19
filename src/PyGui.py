@@ -1,5 +1,6 @@
 from contextlib import contextmanager
-from ctypes import byref, CFUNCTYPE, POINTER, c_int, c_void_p, c_char_p, c_float, c_double, c_bool, c_ushort, Structure
+from ctypes import *
+from enum import IntEnum
 
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
@@ -113,10 +114,6 @@ class ImDrawData(Structure):
     pass
 
 
-class ImWchar(c_ushort):
-    pass
-
-
 class ImVec2(Structure):
     _fields_ = [
         ("x", c_float),
@@ -135,6 +132,24 @@ class ImVec4(Structure):
 
 class ImColor(Structure):
     _fields_ = [("Value", ImVec4)]
+
+
+class ImGuiInputTextCallbackData(Structure):
+    _fields_ = [
+        ('EventFlags', c_int),
+        ('Flags', c_int),
+        ('UserData', c_void_p),
+        ('EventChar', c_wchar),
+        ('EventKey', c_int),
+        ('Buf', c_char_p),
+        ('BufTextLen', c_int),
+        ('BufSize', c_int),
+        ('BufDirty', c_bool),
+        ('CursorPos', c_int),
+        ('SelectionStart', c_int),
+        ('SelectionEnd', c_int),
+
+    ]
 
 
 class ImGuiIO(Structure):
@@ -178,7 +193,7 @@ class ImGuiIO(Structure):
         ("KeyAlt", c_bool),
         ("KeySuper", c_bool),
         ("KeyDown", c_bool * 512),
-        ("InputCharacters", ImWchar * 17),
+        ("InputCharacters", c_wchar * 17),
         ("NavInputs", c_float * ImGuiNavInput.COUNT.value),
         ("WantCaptureMouse", c_bool),
         ("WantCaptureKeyboard", c_bool),
@@ -212,7 +227,33 @@ class ImGuiIO(Structure):
     ]
 
 
+class ImGuiInputTextFlags(IntEnum):
+    ImGuiInputTextFlags_None = 0
+    ImGuiInputTextFlags_CharsDecimal = 1 << 0  # Allow 0123456789.+-*/
+    ImGuiInputTextFlags_CharsHexadecimal = 1 << 1  # Allow 0123456789ABCDEFabcdef
+    ImGuiInputTextFlags_CharsUppercase = 1 << 2  # Turn a..z into A..Z
+    ImGuiInputTextFlags_CharsNoBlank = 1 << 3  # Filter out spaces, tabs
+    ImGuiInputTextFlags_AutoSelectAll = 1 << 4  # Select entire text when first taking mouse focus
+    ImGuiInputTextFlags_EnterReturnsTrue = 1 << 5  # Return 'true' when Enter is pressed (as opposed to when the value was modified)
+    ImGuiInputTextFlags_CallbackCompletion = 1 << 6  # Call user function on pressing TAB (for completion handling)
+    ImGuiInputTextFlags_CallbackHistory = 1 << 7  # Call user function on pressing Up/Down arrows (for history handling)
+    ImGuiInputTextFlags_CallbackAlways = 1 << 8  # Call user function every time. User code may query cursor position, modify text buffer.
+    ImGuiInputTextFlags_CallbackCharFilter = 1 << 9  # Call user function to filter character. Modify data->EventChar to replace/filter input, or return 1 in callback to discard character.
+    ImGuiInputTextFlags_AllowTabInput = 1 << 10  # Pressing TAB input a '\t' character into the text field
+    ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11  # In multi-line mode, unfocus with Enter, add new line with Ctrl+Enter (default is opposite: unfocus with Ctrl+Enter, add line with Enter).
+    ImGuiInputTextFlags_NoHorizontalScroll = 1 << 12  # Disable following the cursor horizontally
+    ImGuiInputTextFlags_AlwaysInsertMode = 1 << 13  # Insert mode
+    ImGuiInputTextFlags_ReadOnly = 1 << 14  # Read-only mode
+    ImGuiInputTextFlags_Password = 1 << 15  # Password mode, display all characters as '*'
+    ImGuiInputTextFlags_NoUndoRedo = 1 << 16  # Disable undo/redo. Note that input text owns the text data while active, if you want to provide your own undo/redo stack you need e.g. to call ClearActiveID().
+    ImGuiInputTextFlags_CharsScientific = 1 << 17  # Allow 0123456789.+-*/eE (Scientific notation input)
+    ImGuiInputTextFlags_CallbackResize = 1 << 18  # Allow buffer capacity resize + notify when the string wants to be resized (for string types which hold a cache of their Size) (see misc/stl/imgui_stl.h for an example of using this)
+    # [Internal]
+    ImGuiInputTextFlags_Multiline = 1 << 20  # For internal use by InputTextMultiline()
+
+
 class PyGui(object):
+    text_callback = CFUNCTYPE(c_int, POINTER(ImGuiInputTextCallbackData))
     _lib = None
 
     def __init__(self, clib):
@@ -245,10 +286,11 @@ class PyGui(object):
     @contextmanager
     def new_window(self, name, open=True, flags=c_int(0)):
         try:
-            created,open = self.begin(name,open,flags)
+            created, open = self.begin(name, open, flags)
             yield open
         finally:
             self.end()
+
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
         rtn = self._lib.ImGui_Begin(name.encode('utf-8'), byref(p_open), flags)
@@ -290,8 +332,23 @@ class PyGui(object):
     def text(self, text):
         return self._lib.ImGui_Text(text.encode('utf-8'))
 
-    def input_text(self, text):
-        return self._lib.ImGui_InputText(text.encode('utf-8'))
+    # const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data
+    def input_text(self, text, text_size=1024, flags=0, callback=None, user_data={}):
+        buffer = create_string_buffer(text_size)
+
+        if not callback:
+            def plug(data):
+                return 0
+
+            callback = plug
+
+        def wrapper(event):
+            return callback(event.contents)
+
+        c_callback = self.text_callback(wrapper)
+        flags |= ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags.ImGuiInputTextFlags_EnterReturnsTrue
+        result = self._lib.ImGui_InputText(text.encode('utf-8'), byref(buffer), text_size, flags, c_callback, None)
+        return result
 
     def get_io(self):
         return self._lib.ImGui_GetIO()
