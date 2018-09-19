@@ -55,7 +55,7 @@ class CLib(object):
                 break
         libfile.close()
         self._tempfile.close()
-        self._lib = CDLL(str(Path(self._tempfile.name)))
+        self._lib = CDLL(self._tempfile.name)
         for k in self.functypes:
             if hasattr(self._lib, k):
                 getattr(self._lib, k).restype = self.functypes[k][0]
