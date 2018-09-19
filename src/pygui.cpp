@@ -475,6 +475,11 @@ void ImGui_TextUnformatted(const char* text, const char* text_end)
     TextUnformatted(text, text_end);
 }
 
+void ImGui_Text(const char* text)
+{
+    Text(text);
+}
+
 bool ImGui_Button(const char* label, vec2 size)
 {
     return Button(label, ImVec2(size.x, size.y));

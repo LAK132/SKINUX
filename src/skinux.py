@@ -1,7 +1,10 @@
+import faulthandler
+
+faulthandler.enable()
 import os
 import platform
 from pathlib import Path
-
+from CLib import CLib
 from PyGui import *
 from PyGui import PyGui, ImGuiDir
 
@@ -46,19 +49,31 @@ clib = CLib(str(clib_dir), dict(
     ImGui_BeginGroup=[None, []],
     ImGui_EndGroup=[None, []],
     ImGui_TextUnformatted=[None, [c_char_p, c_char_p]],
+    ImGui_Text=[None, [c_char_p]],
     ImGui_Button=[c_bool, [c_char_p, ImVec2]],
     ImGui_SmallButton=[c_bool, [c_char_p]],
     ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
     ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]))
-pygui = PyGui(clib)
 
+pygui = PyGui(clib)
+a = False
 with pygui as gui:
     while gui.running:
         with gui.update_app():
-            if pygui.begin("SKINUX"):
-                if pygui.button("Exit", ImVec2(100, 100)):
+            if gui.begin("SKINUX"):
+                if gui.button("Exit", ImVec2(100, 100)):
                     gui.running = False
-                if pygui.arrow_button('Test', ImGuiDir.Right):
+                gui.separator()
+                if gui.button('Test'):
+                    a = True
                     print('test')
-                    pass
-                pygui.end()
+
+                if a:
+                    gui.begin_child('Scrolling')
+                    gui.button('test')
+                    gui.end_child()
+                    # with gui.new_child('Scrolling'):
+                    #     if pygui.button("Button {}".format(1)):
+                    #         a = False
+
+                gui.end()

@@ -1,12 +1,11 @@
+import atexit
+import os
 import sys
 from ctypes import CDLL
-import os
-from ctypes import CDLL
-from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 
-class CLib(object):
+class CLib:
     _tempfile = None
     _lib = None
     import _ctypes
@@ -14,9 +13,9 @@ class CLib(object):
     functypes = dict()
 
     def __init__(self, filename=None, functypes=None):
-        if functypes != None:
+        if functypes is not None:
             self.functypes = functypes
-        if filename != None:
+        if filename is not None:
             self.load(filename)
 
     def __getattr__(self, name):
@@ -34,10 +33,10 @@ class CLib(object):
         self._free()
 
     def _free(self):
-        if self._lib != None:
+        if self._lib is not None:
             handle = self._lib._handle
             del self._lib
-            if self._libclose != None: self._libclose(handle)
+            if self._libclose is not None: self._libclose(handle)
         if self._tempfile != None:
             self._tempfile.close()
             os.remove(self._tempfile.name)
@@ -65,3 +64,6 @@ class CLib(object):
             self._free()
         except:
             sys.stderr.write('Failed to delete temp lib')
+
+
+

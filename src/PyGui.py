@@ -1,13 +1,13 @@
 from contextlib import contextmanager
-from ctypes import byref, CFUNCTYPE, POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_double, c_bool, c_ushort, Structure
-
-from CLib import CLib
+from ctypes import byref, CFUNCTYPE, POINTER, c_int, c_void_p, c_char_p, c_float, c_double, c_bool, c_ushort, Structure
 
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
 
+
 class enum(object):
     """A C enum like objec"""
+
     def __init__(self, names):
         if isinstance(names, list):
             self._dict = dict({v: c_int(i) for i, v in enumerate(names)})
@@ -24,6 +24,7 @@ class enum(object):
             return self.__dict__[item]
         elif item in self._dict:
             return self._dict[item]
+
 
 ImGuiKey = enum([
     'Tab',
@@ -89,6 +90,7 @@ ImGuiWindowFlags = enum([
     'None'
 ])
 
+
 # ImGuiFocusedFlags
 # ImGuiHoveredFlags
 # ImGuiCond
@@ -98,23 +100,29 @@ ImGuiWindowFlags = enum([
 class ImTextureID(c_void_p):
     pass
 
+
 class ImFontAtlas(Structure):
     pass
+
 
 class ImFont(Structure):
     pass
 
+
 class ImDrawData(Structure):
     pass
 
+
 class ImWchar(c_ushort):
     pass
+
 
 class ImVec2(Structure):
     _fields_ = [
         ("x", c_float),
         ("y", c_float)
     ]
+
 
 class ImVec4(Structure):
     _fields_ = [
@@ -124,8 +132,10 @@ class ImVec4(Structure):
         ("w", c_float)
     ]
 
+
 class ImColor(Structure):
     _fields_ = [("Value", ImVec4)]
+
 
 class ImGuiIO(Structure):
     _fields_ = [
@@ -202,9 +212,9 @@ class ImGuiIO(Structure):
     ]
 
 
-
 class PyGui(object):
     _lib = None
+
     def __init__(self, clib):
         self._lib = clib
         self.running = False
@@ -226,35 +236,54 @@ class PyGui(object):
         finally:
             self._lib.endUpdate()
 
+    @contextmanager
+    def new_child(self, name, size=ImVec2(0, 0), border=c_bool(False), flags=c_int(0)):
+        try:
+            yield self.begin_child(name, size, border, flags)
+        finally:
+            self.end_child()
+
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
-        rtn = self._lib.ImGui_Begin(name.encode('ascii'), byref(p_open), flags)
+        rtn = self._lib.ImGui_Begin(name.encode('utf-8'), byref(p_open), flags)
         return rtn, p_open.value
 
     def end(self):
         self._lib.ImGui_End()
 
-    def begin_child(self, str_id, size=ImVec2(0,0), border=c_bool(False), flags=c_int(0)):
-        return self._lib.ImGui_BeginChild(str_id.encode('ascii'), size, border, flags)
+    def begin_child(self, str_id, size=ImVec2(0, 0), border=c_bool(False), flags=c_int(0)):
+        return self._lib.ImGui_BeginChild(str_id.encode('utf-8'), size, border, flags)
 
     def end_child(self):
         self._lib.ImGui_EndChild()
 
-    def button(self, label, size=ImVec2(0,0)):
-        return self._lib.ImGui_Button(label.encode('ascii'), size)
+    def button(self, label, size=ImVec2(0, 0)):
+        return self._lib.ImGui_Button(label.encode('utf-8'), size)
+
+    def new_line(self):
+        return self._lib.ImGui_NewLine()
+
+    def spacing(self):
+        return self._lib.ImGui_Spacing()
+
+    def separator(self):
+        return self._lib.ImGui_Separator()
 
     def small_button(self, label):
-        return self._lib.ImGui_SmallButton(label.encode('ascii'))
+        return self._lib.ImGui_SmallButton(label.encode('utf-8'))
 
     def invisible_button(self, label, size):
-        return self._lib.ImGui_InvisibleButton(label.encode('ascii'), size)
+        return self._lib.ImGui_InvisibleButton(label.encode('utf-8'), size)
 
     def arrow_button(self, label, direction):
-        return self._lib.ImGui_ArrowButton(label.encode('ascii'), direction)
+        return self._lib.ImGui_ArrowButton(label.encode('utf-8'), direction)
+
+    def text(self, text):
+        return self._lib.ImGui_Text(text.encode('utf-8'))
 
     # def image_button(self, texture_id, size, u0=c_float(0), v0=c_float(0), u1=c_float(1), v1=c_float(1), padding=c_int(-1)):
     #     pass
-    
+
     # def checkbox(self, label, value):
     #     val = c_bool(value)
     #     rtn = self._lib.ImGui_Checkbox(label, byref(val))
