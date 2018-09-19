@@ -53,7 +53,8 @@ clib = CLib(str(clib_dir), dict(
     ImGui_Button=[c_bool, [c_char_p, ImVec2]],
     ImGui_SmallButton=[c_bool, [c_char_p]],
     ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
-    ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]
+    ImGui_ArrowButton=[c_bool, [c_char_p, c_int]],
+    ImGui_GetIO=[POINTER(ImGuiIO), []]
 ))
 
 pygui = PyGui(clib)
@@ -67,6 +68,7 @@ with pygui as gui:
                 gui.separator()
                 if gui.button('Test'):
                     a = True
+                    io = gui.get_io()
                     print('test')
 
                 if a:

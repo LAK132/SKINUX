@@ -545,3 +545,8 @@ void ImGui_EndCombo()
 {
     EndCombo();
 }
+
+
+ImGuiIO& ImGui_GetIO(){
+    return GetIO();
+}

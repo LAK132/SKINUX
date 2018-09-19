@@ -227,7 +227,6 @@ class PyGui(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._lib.stop()
         del self._lib
-        print('Cleaned temp lib')
 
     @contextmanager
     def update_app(self):
@@ -247,7 +246,6 @@ class PyGui(object):
     def new_window(self, name, open=True, flags=c_int(0)):
         try:
             created,open = self.begin(name,open,flags)
-            self.running = created
             yield open
         finally:
             self.end()
@@ -288,6 +286,9 @@ class PyGui(object):
 
     def text(self, text):
         return self._lib.ImGui_Text(text.encode('utf-8'))
+
+    def get_io(self):
+        return self._lib.ImGui_GetIO()
 
     # def image_button(self, texture_id, size, u0=c_float(0), v0=c_float(0), u1=c_float(1), v1=c_float(1), padding=c_int(-1)):
     #     pass

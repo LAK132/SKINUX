@@ -28,6 +28,9 @@ set OUTDIR=!OUTDIR!\%mode%\%target%
 set LIBDIR=!LIBDIR!\%target%
 set OUT=%OUTDIR%\%APP%
 
+if exist %OUTDIR% rmdir /s /q %OUTDIR%
+if exist %BINDIR% rmdir /s /q %BINDIR%
+
 if not exist %OUTDIR% mkdir %OUTDIR%
 if not exist %BINDIR% mkdir %BINDIR%
 

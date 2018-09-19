@@ -153,6 +153,6 @@ PY_EXPORT void ImGui_Bullet();
 PY_EXPORT bool ImGui_BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags);
 PY_EXPORT void ImGui_EndCombo();
 
-
+PY_EXPORT ImGuiIO& ImGui_GetIO();
 
 #endif // PYGUI_H
