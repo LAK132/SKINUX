@@ -82,6 +82,19 @@ ImGuiDir = enum({
     'COUNT': 4
 })
 
+ImGuiWindowFlags = enum([
+    'None'
+])
+
+# ImGuiFocusedFlags
+# ImGuiHoveredFlags
+# ImGuiCond
+# ImGuiSizeCallback
+# ImGuiStyleVar
+
+class ImTextureID(c_void_p):
+    pass
+
 class ImFontAtlas(Structure):
     pass
 
@@ -198,26 +211,25 @@ class PyGui(object):
     def end(self):
         self._lib.ImGui_End()
 
-    def begin_child(self, str_id, width=c_float(0), height=c_float(0), border=c_bool(False), flags=c_int(0)):
-        return self._lib.ImGui_BeginChild(str_id, width, height, border, flags)
+    def begin_child(self, str_id, size=ImVec2(0,0), border=c_bool(False), flags=c_int(0)):
+        return self._lib.ImGui_BeginChild(str_id.encode('ascii'), size, border, flags)
 
     def end_child(self):
         self._lib.ImGui_EndChild()
 
-    def button(self, label, width=c_float(0), height=c_float(0)):
-        # return self._lib.ImGui_Button(label, width, height)
-        return self._lib.ImGui_Button(label.encode('ascii'), width, height)
+    def button(self, label, size=ImVec2(0,0)):
+        return self._lib.ImGui_Button(label.encode('ascii'), size)
 
     def small_button(self, label):
         return self._lib.ImGui_SmallButton(label.encode('ascii'))
 
-    def invisible_button(self, label, width, height):
-        return self._lib.ImGui_InvisibleButton(label, width, height)
+    def invisible_button(self, label, size):
+        return self._lib.ImGui_InvisibleButton(label.encode('ascii'), size)
 
     def arrow_button(self, label, direction):
-        return self._lib.ImGui_ArrowButton(label, direction)
+        return self._lib.ImGui_ArrowButton(label.encode('ascii'), direction)
 
-    # def image_button(self, texture_id, width, height, u0=c_float(0), v0=c_float(0), u1=c_float(1), v1=c_float(1), padding=c_int(-1)):
+    # def image_button(self, texture_id, size, u0=c_float(0), v0=c_float(0), u1=c_float(1), v1=c_float(1), padding=c_int(-1)):
     #     pass
     
     # def checkbox(self, label, value):
