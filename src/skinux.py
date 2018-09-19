@@ -72,4 +72,5 @@ with pygui as gui:
                 if a:
                     with gui.new_child('Scrolling') as success:
                         if success:
-                            gui.text('Test text')
+                            for _ in range(16):
+                                gui.text('Test text')
