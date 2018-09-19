@@ -275,6 +275,9 @@ class PyGui(object):
     def separator(self):
         return self._lib.ImGui_Separator()
 
+    def bullet(self):
+        return self._lib.ImGui_Bullet()
+
     def small_button(self, label):
         return self._lib.ImGui_SmallButton(label.encode('utf-8'))
 
@@ -286,6 +289,9 @@ class PyGui(object):
 
     def text(self, text):
         return self._lib.ImGui_Text(text.encode('utf-8'))
+
+    def input_text(self, text):
+        return self._lib.ImGui_InputText(text.encode('utf-8'))
 
     def get_io(self):
         return self._lib.ImGui_GetIO()

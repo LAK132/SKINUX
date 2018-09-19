@@ -550,3 +550,7 @@ void ImGui_EndCombo()
 ImGuiIO& ImGui_GetIO(){
     return GetIO();
 }
+bool ImGui_InputText(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+    return InputText(label, buf, buf_size, flags, callback,  user_data);
+}

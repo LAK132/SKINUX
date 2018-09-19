@@ -43,6 +43,7 @@ clib = CLib(str(clib_dir), dict(
     ImGui_SameLine=[None, [c_float, c_float]],
     ImGui_NewLine=[None, []],
     ImGui_Spacing=[None, []],
+    ImGui_Bullet=[None, []],
     ImGui_Dummy=[None, [ImVec2]],
     ImGui_Indent=[None, [c_float]],
     ImGui_Unindent=[None, [c_float]],
@@ -66,13 +67,12 @@ with pygui as gui:
                 if gui.button("Exit", ImVec2(100, 100)):
                     gui.running = False
                 gui.separator()
-                if gui.button('Test'):
+                if gui.button('Show nasty things'):
                     a = True
                     io = gui.get_io()
-                    print('test')
 
                 if a:
-                    with gui.new_child('Scrolling') as success:
+                    with gui.new_child('') as success:
                         if success:
                             for _ in range(16):
-                                gui.text('Test text')
+                                gui.bullet()

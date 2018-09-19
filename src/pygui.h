@@ -154,5 +154,6 @@ PY_EXPORT bool ImGui_BeginCombo(const char* label, const char* preview_value, Im
 PY_EXPORT void ImGui_EndCombo();
 
 PY_EXPORT ImGuiIO& ImGui_GetIO();
+PY_EXPORT bool ImGui_InputText(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data);
 
 #endif // PYGUI_H
