@@ -1,7 +1,183 @@
-from ctypes import byref, POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_bool
+from ctypes import byref, CFUNCTYPE, POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_double, c_bool, c_ushort, Structure
 
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
+
+class enum(object):
+    """A C enum like objec"""
+    def __init__(self, names):
+        if isinstance(names, list):
+            self._dict = dict({v: c_int(i) for i, v in enumerate(names)})
+        else:
+            self._dict = dict({k: c_int(names[k]) for k in names})
+
+    def __getattr__(self, name):
+        if self._dict == None:
+            return None
+        return self._dict[name]
+
+ImGuiKey = enum([
+    'Tab',
+    'LeftArrow',
+    'RightArrow',
+    'UpArrow',
+    'DownArrow',
+    'PageUp',
+    'PageDown',
+    'Home',
+    'End',
+    'Insert',
+    'Delete',
+    'Backspace',
+    'Space',
+    'Enter',
+    'Escape',
+    'A',
+    'C',
+    'V',
+    'X',
+    'Y',
+    'Z',
+    'COUNT'
+])
+
+ImGuiNavInput = enum([
+    'Activate',
+    'Cancel',
+    'Input',
+    'Menu',
+    'DpadLeft',
+    'DpadRight',
+    'DpadUp',
+    'DpadDown',
+    'LStickLeft',
+    'LStickRight',
+    'LStickUp',
+    'LStickDown',
+    'FocusPrev',
+    'FocusNext',
+    'TweakSlow',
+    'TweakFast',
+    # Internal
+    'KeyMenu_',
+    'KeyLeft_',
+    'KeyRight_',
+    'KeyDown_',
+    'COUNT',
+    # 'InternalStart_' = ImGuiNavInput.KeyMenu_
+])
+
+ImGuiDir = enum({
+    'None': -1,
+    'Left': 0,
+    'Right': 1,
+    'Up': 2,
+    'Down': 3,
+    'COUNT': 4
+})
+
+class ImFontAtlas(Structure):
+    pass
+
+class ImFont(Structure):
+    pass
+
+class ImDrawData(Structure):
+    pass
+
+class ImWchar(c_ushort):
+    pass
+
+class ImVec2(Structure):
+    _fields_ = [
+        ("x", c_float),
+        ("y", c_float)
+    ]
+
+class ImVec4(Structure):
+    _fields_ = [
+        ("x", c_float),
+        ("y", c_float),
+        ("z", c_float),
+        ("w", c_float)
+    ]
+
+class ImColor(Structure):
+    _fields_ = [("Value", ImVec4)]
+
+class ImGuiIO(Structure):
+    _fields_ = [
+        ("ConfigFlags", c_int),
+        ("BackendFlags", c_int),
+        ("DisplaySize", ImVec2),
+        ("DeltaTime", c_float),
+        ("IniSavingRate", c_float),
+        ("IniFileName", c_char_p),
+        ("LogFileName", c_char_p),
+        ("MouseDoubleClickTime", c_float),
+        ("MouseDoubleThreshold", c_float),
+        ("KeyMap", c_int * ImGuiKey.COUNT.value),
+        ("KeyRepeatDelay", c_float),
+        ("KeyRepeatRate", c_float),
+        ("UserData", c_void_p),
+        ("Fonts", POINTER(ImFontAtlas)),
+        ("FontGlobalScale", c_float),
+        ("FontAllowUserScaling", c_bool),
+        ("FontDefault", POINTER(ImFont)),
+        ("DisplayFrameBufferScale", ImVec2),
+        ("DisplayVisibleMin", ImVec2),
+        ("DisplayVisibleMax", ImVec2),
+        ("ConfigMacOSXBehaviors", c_bool),
+        ("ConfigCursorBlink", c_bool),
+        ("ConfigResizeWindowsFromEdges", c_bool),
+        ("GetClipboardTextFn", CFUNCTYPE(c_char_p, c_void_p)),
+        ("SetClipboardTestFn", CFUNCTYPE(None, c_void_p, c_char_p)),
+        ("ClipboardUserData", c_void_p),
+        ("ImeSetInputScreenPosFn", CFUNCTYPE(None, c_int, c_int)),
+        ("ImeWindowHandle", c_void_p),
+        ("RenderDrawListFn", CFUNCTYPE(None, POINTER(ImDrawData))),
+        ("MousePos", ImVec2),
+        ("MouseDown", c_bool * 5),
+        ("MouseWheel", c_float),
+        ("MouseWheelH", c_float),
+        ("MouseDrawCursor", c_bool),
+        ("KeyCtrl", c_bool),
+        ("KeyShift", c_bool),
+        ("KeyAlt", c_bool),
+        ("KeySuper", c_bool),
+        ("KeyDown", c_bool * 512),
+        ("InputCharacters", ImWchar * 17),
+        ("NavInputs", c_float * ImGuiNavInput.COUNT.value),
+        ("WantCaptureMouse", c_bool),
+        ("WantCaptureKeyboard", c_bool),
+        ("WantTextInput", c_bool),
+        ("WantSetMousePos", c_bool),
+        ("WantSaveIniSettings", c_bool),
+        ("NavActive", c_bool),
+        ("NavVisible", c_bool),
+        ("Framerate", c_float),
+        ("MetricsRenderVertices", c_int),
+        ("MetricsRenderIndices", c_int),
+        ("MetricsRenderWindows", c_int),
+        ("MetricsActiveWindows", c_int),
+        ("MetricsActiveAllocations", c_int),
+        ("MouseDelta", ImVec2),
+        ("MousePosPrev", ImVec2),
+        ("MouseClickedPos", ImVec2 * 5),
+        ("MouseClickedTime", c_double * 5),
+        ("MouseClicked", c_bool * 5),
+        ("MouseDoubleClicked", c_bool * 5),
+        ("MouseReleased", c_bool * 5),
+        ("MouseDownOwned", c_bool * 5),
+        ("MouseDownDuration", c_float * 5),
+        ("MouseDownDurationPrev", c_float * 5),
+        ("MouseDragMaxDistanceAbs", ImVec2 * 5),
+        ("MouseDragMaxDistanceSqr", c_float * 5),
+        ("KeyDownDuration", c_float * 512),
+        ("KeyDownDurationPrev", c_float * 512),
+        ("NavInputsDownDuration", c_float * ImGuiNavInput.COUNT.value),
+        ("NavInputsDownDurationPrev", c_float * ImGuiNavInput.COUNT.value)
+    ]
 
 class PyGui(object):
     _lib = None
