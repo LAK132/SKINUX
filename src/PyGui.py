@@ -205,34 +205,7 @@ class ImGuiIO(Structure):
 
 class PyGui(object):
     _lib = None
-    def __init__(self, clibdir):
-        clib = CLib(str(clibdir), dict(
-            init=[None, []],
-            stop=[None, []],
-            beginOpenGLAccess=[None, []],
-            endOpenGLAccess=[None, []],
-            beginUpdate=[c_bool, []],
-            endUpdate=[None, []],
-
-            ImGui_Begin=[c_bool, [c_char_p, c_bool_p, c_int]],
-            ImGui_End=[None, []],
-            ImGui_BeginChild=[c_bool, [c_char_p, ImVec2, c_bool, c_int]],
-            ImGui_EndChild=[None, []],
-            ImGui_Separator=[None, []],
-            ImGui_SameLine=[None, [c_float, c_float]],
-            ImGui_NewLine=[None, []],
-            ImGui_Spacing=[None, []],
-            ImGui_Dummy=[None, [ImVec2]],
-            ImGui_Indent=[None, [c_float]],
-            ImGui_Unindent=[None, [c_float]],
-            ImGui_BeginGroup=[None, []],
-            ImGui_EndGroup=[None, []],
-            ImGui_TextUnformatted=[None, [c_char_p, c_char_p]],
-            ImGui_Button=[c_bool, [c_char_p, ImVec2]],
-            ImGui_SmallButton=[c_bool, [c_char_p]],
-            ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
-            ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]
-        ))
+    def __init__(self, clib):
         self._lib = clib
         self.running = False
 
