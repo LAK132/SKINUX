@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from ctypes import byref, CFUNCTYPE, POINTER, c_int, c_void_p, c_char_p, c_float, c_double, c_bool, c_ushort, Structure
 
 c_bool_p = POINTER(c_bool)
@@ -211,7 +210,6 @@ class ImGuiIO(Structure):
         ("NavInputsDownDurationPrev", c_float * ImGuiNavInput.COUNT.value)
     ]
 
-
 class PyGui(object):
     _lib = None
 
@@ -229,31 +227,30 @@ class PyGui(object):
         del self._lib
         print('Cleaned temp lib')
 
-    @contextmanager
-    def update_app(self):
-        try:
-            yield self._lib.beginUpdate()
-        finally:
-            self._lib.endUpdate()
+    def update(self):
+        while self.running:
+            try:
+                self.running = self._lib.beginUpdate()
+                yield self.running
+            finally:
+                self._lib.endUpdate()
 
-    @contextmanager
-    def new_child(self, name, size=ImVec2(0, 0), border=c_bool(False), flags=c_int(0)):
+    def scroll_region(self, name, size=ImVec2(0, 0), border=c_bool(False), flags=c_int(0)):
+        rtn = self.begin_child(name, size, border, flags)
         try:
-            yield self.begin_child(name, size, border, flags)
+            if rtn:
+                yield
         finally:
-            print('End child')
             self.end_child()
 
-    @contextmanager
-    def new_window(self, name, open=True, flags=c_int(0)):
+    def window(self, name, open=True, flags=c_int(0)):
+        rtn, open = self.begin(name, open, flags)
         try:
-            created,open = self.begin(name,open,flags)
-            self.running = created
-            yield open
-        except Exception as ex:
-            print(ex)
+            if rtn:
+                yield
         finally:
             self.end()
+
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
         rtn = self._lib.ImGui_Begin(name.encode('utf-8'), byref(p_open), flags)

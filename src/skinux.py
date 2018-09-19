@@ -1,5 +1,4 @@
 import faulthandler
-
 faulthandler.enable()
 import os
 import platform
@@ -56,20 +55,17 @@ clib = CLib(str(clib_dir), dict(
     ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]
 ))
 
-pygui = PyGui(clib)
 a = False
-with pygui as gui:
-    while gui.running:
-        with gui.update_app():
-            with gui.new_window("SKINUX"):
-                if gui.button("Exit", ImVec2(100, 100)):
-                    gui.running = False
-                gui.separator()
-                if gui.button('Test'):
-                    a = True
-                    print('test')
 
-                if a:
-                    with gui.new_child('Scrolling') as success:
-                        if success:
-                            gui.text('Test text')
+with PyGui(clib) as pygui:
+    for _ in pygui.update():
+        for _ in pygui.window("SKINUX"):
+            if pygui.button("Exit", ImVec2(100, 100)):
+                pygui.running = False
+            pygui.separator()
+            if pygui.button('Test'):
+                a = True
+                print('test')
+            if a:
+                for _ in pygui.scroll_region('Scrolling'):
+                    pygui.text('Test text')
