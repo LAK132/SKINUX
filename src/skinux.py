@@ -16,7 +16,6 @@ windows = os_type == "WindowsPE"
 lib_bitness = 'x86' if bitness == '32bit' else 'x64'
 debug = True
 
-
 clibdir = Path('./out').absolute()
 if debug:
     clibdir /= 'debug'
@@ -27,6 +26,7 @@ if windows:
 os.chdir(clibdir.as_posix())
 clibdir = (clibdir / "libSkinux").with_suffix(".dll" if windows else ".so")
 print('Loading {}'.format(clibdir))
+
 clib = CLib(str(clibdir), dict(
     init=[None, []],
     stop=[None, []],
@@ -57,7 +57,6 @@ clib = CLib(str(clibdir), dict(
 
 pygui = PyGui(clib)
 
-
 @contextmanager
 def graphicsThread():
     try:
@@ -66,14 +65,12 @@ def graphicsThread():
     finally:
         clib.stop()
 
-
 @contextmanager
 def graphicsUpdate():
     try:
         yield clib.beginUpdate()
     finally:
         clib.endUpdate()
-
 
 with graphicsThread() as running:
     while running:

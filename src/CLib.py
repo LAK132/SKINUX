@@ -44,8 +44,6 @@ class CLib(object):
     def load(self, filename):
         self._free()
         self._tempfile = NamedTemporaryFile(delete=False, suffix=".ctypelib")
-
-
         libfile = open(filename, 'rb')
         while True:
             b = libfile.read(2048)
