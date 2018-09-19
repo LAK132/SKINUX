@@ -1,5 +1,5 @@
 from CLib import CLib
-from PyGui import PyGui
+from PyGui import PyGui, ImGuiDir
 from contextlib import contextmanager
 from sys import platform
 from ctypes import POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_bool
@@ -8,7 +8,7 @@ import os
 c_bool_p = POINTER(c_bool)
 c_float_p = POINTER(c_float)
 
-os.chdir("out/debug")
+os.chdir("../out/debug")
 if platform=="win32":
     os.chdir("x86")
 
@@ -66,4 +66,7 @@ with graphicsThread() as running:
             if pygui.begin("SKINUX"):
                 if pygui.button("Exit"):
                     running = False
+                if pygui.arrow_button('Test',ImGuiDir.Right):
+                    print('test')
+                    pass
                 pygui.end()

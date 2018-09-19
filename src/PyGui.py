@@ -16,6 +16,12 @@ class enum(object):
             return None
         return self._dict[name]
 
+    def __getitem__(self, item):
+        if item in self.__dict__:
+            return self.__dict__[item]
+        elif item in self._dict:
+            return self._dict[item]
+
 ImGuiKey = enum([
     'Tab',
     'LeftArrow',
@@ -186,7 +192,7 @@ class PyGui(object):
     
     def begin(self, name, open=True, flags=c_int(0)):
         p_open = c_bool(open)
-        rtn = self._lib.ImGui_Begin(name, byref(p_open), flags)
+        rtn = self._lib.ImGui_Begin(name.encode('ascii'), byref(p_open), flags)
         return rtn, p_open.value
 
     def end(self):
@@ -199,10 +205,11 @@ class PyGui(object):
         self._lib.ImGui_EndChild()
 
     def button(self, label, width=c_float(0), height=c_float(0)):
-        return self._lib.ImGui_Button(label, width, height)
+        # return self._lib.ImGui_Button(label, width, height)
+        return self._lib.ImGui_Button(label.encode('ascii'), width, height)
 
     def small_button(self, label):
-        return self._lib.ImGui_SmallButton(label)
+        return self._lib.ImGui_SmallButton(label.encode('ascii'))
 
     def invisible_button(self, label, width, height):
         return self._lib.ImGui_InvisibleButton(label, width, height)
