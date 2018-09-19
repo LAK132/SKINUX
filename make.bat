@@ -19,6 +19,8 @@ if not "%target%"=="x86" if not "%target%"=="x64" (
     goto usage
 )
 
+if "%3"=="force" call make.bat clean
+
 :compile
 echo Compiling in %mode% mode for %target%
 title Compiler
