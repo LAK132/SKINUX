@@ -163,7 +163,7 @@ int main()
         run = beginUpdate();
         if (ImGui_Begin("SKINUX TEST", NULL, 0))
         {
-            if (ImGui_SmallButton("Exit"))
+            if (ImGui_Button("Exit", {0, 0}))
                 run = false;
             ImGui_End();
         }

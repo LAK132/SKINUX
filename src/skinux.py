@@ -1,8 +1,8 @@
-from CLib import CLib
-from PyGui import PyGui
+from CLib import *
+from PyGui import *
 from contextlib import contextmanager
 from sys import platform
-from ctypes import POINTER, sizeof, c_int, c_void_p, c_char_p, c_float, c_bool
+from ctypes import *
 import os
 
 c_bool_p = POINTER(c_bool)
@@ -24,21 +24,21 @@ clib = CLib(clibdir, dict(
 
     ImGui_Begin=[c_bool, [c_char_p, c_bool_p, c_int]],
     ImGui_End=[None, []],
-    ImGui_BeginChild=[c_bool, [c_char_p, c_float, c_float, c_bool, c_int]],
+    ImGui_BeginChild=[c_bool, [c_char_p, ImVec2, c_bool, c_int]],
     ImGui_EndChild=[None, []],
     ImGui_Separator=[None, []],
     ImGui_SameLine=[None, [c_float, c_float]],
     ImGui_NewLine=[None, []],
     ImGui_Spacing=[None, []],
-    ImGui_Dummy=[None, [c_float, c_float]],
+    ImGui_Dummy=[None, [ImVec2]],
     ImGui_Indent=[None, [c_float]],
     ImGui_Unindent=[None, [c_float]],
     ImGui_BeginGroup=[None, []],
     ImGui_EndGroup=[None, []],
     ImGui_TextUnformatted=[None, [c_char_p, c_char_p]],
-    ImGui_Button=[c_bool, [c_char_p, c_float, c_float]],
+    ImGui_Button=[c_bool, [c_char_p, ImVec2]],
     ImGui_SmallButton=[c_bool, [c_char_p]],
-    ImGui_InvisibleButton=[c_bool, [c_char_p, c_float, c_float]],
+    ImGui_InvisibleButton=[c_bool, [c_char_p, ImVec2]],
     ImGui_ArrowButton=[c_bool, [c_char_p, c_int]]
 ))
 
@@ -64,6 +64,6 @@ with graphicsThread() as running:
         with graphicsUpdate() as cont:
             running = cont
             if pygui.begin("SKINUX"):
-                if pygui.button("Exit"):
+                if pygui.button("Exit", ImVec2(100, 100)):
                     running = False
                 pygui.end()

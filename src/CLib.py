@@ -36,6 +36,7 @@ class CLib(object):
             del self._lib
             if self._libclose != None: self._libclose(handle)
         if self._tempfile != None:
+            self._tempfile.close()
             os.remove(self._tempfile.name)
 
     def load(self, filename):
