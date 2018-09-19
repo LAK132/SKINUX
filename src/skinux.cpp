@@ -1,17 +1,5 @@
 #include "skinux.h"
-
-#include <imgui/imgui.cpp>
-#include <imgui/imgui_draw.cpp>
-#include <imgui/imgui_demo.cpp>
 #include <imgui/imgui_impl_sdl_gl3.cpp>
-
-extern "C" {
-#include <GL/gl3w.c>
-}
-
-#include "pygui.cpp"
-
-#include "lak/queue.cpp"
 
 SDL_Window* window;
 SDL_GLContext context;
@@ -96,9 +84,8 @@ void init()
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback((GLDEBUGPROC)[](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
     {
-        cout << std::ios::hex << "GL CALLBACK: " 
-            << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR ** type = 0x" : "type = 0x") << type 
-            << ", severity = 0x" << severity
+        if (type == GL_DEBUG_TYPE_ERROR)
+            cout << std::ios::hex << "** GL ERROR ** severity = 0x" << severity
             << ", message = " << endl << message << endl << endl;
     }, 0);
     #else
@@ -114,6 +101,8 @@ void init()
     glClearColor(0.0f, 0.3125f, 0.3125f, 1.0f);
 
     draw();
+    SDL_GL_SwapWindow(window);
+    SDL_GL_MakeCurrent(window, 0); // make sure to release the window from this thread
     update();
     ImGui::Render();
 
@@ -121,7 +110,7 @@ void init()
     drawThread = thread(drawLoop);
 }
 
-void shutdown()
+void stop()
 {
     assert(running);
     running = false;
@@ -164,3 +153,31 @@ void endUpdate()
     ImGui::Render();
     updateRunning.reset();
 }
+
+int main()
+{
+    init();
+    bool run = true;
+    while (run)
+    {
+        run = beginUpdate();
+        if (ImGui_Begin("SKINUX TEST", NULL, 0))
+        {
+            if (ImGui_SmallButton("Exit"))
+                run = false;
+            ImGui_End();
+        }
+        endUpdate();
+    }
+    stop();
+    return 0;
+}
+
+#include <imgui/imgui.cpp>
+#include <imgui/imgui_draw.cpp>
+#include <imgui/imgui_demo.cpp>
+extern "C" {
+#include <GL/gl3w.c>
+}
+#include "pygui.cpp"
+#include "lak/queue.cpp"

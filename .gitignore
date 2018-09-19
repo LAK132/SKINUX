@@ -1,8 +1,9 @@
-bin
-out
-.vscode
-.vs
+bin/
+out/
+.vscode/
+.vs/
+__pycache__/
 *.pdb
-__pycache__
-genmake.py
 *.pyc
+genmake.py
+imgui.ini

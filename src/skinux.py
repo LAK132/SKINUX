@@ -16,7 +16,7 @@ clibdir = "libSkinux.{}".format("dll" if platform=="win32" else "so")
 
 clib = CLib(clibdir, dict(
     init=[None, []],
-    shutdown=[None, []],
+    stop=[None, []],
     beginOpenGLAccess=[None, []],
     endOpenGLAccess=[None, []],
     beginUpdate=[c_bool, []],
@@ -50,7 +50,7 @@ def graphicsThread():
         clib.init()
         yield True
     finally:
-        clib.shutdown()
+        clib.stop()
 
 @contextmanager
 def graphicsUpdate():
@@ -63,7 +63,7 @@ with graphicsThread() as running:
     while running:
         with graphicsUpdate() as cont:
             running = cont
-            # if pygui.begin("SKINUX"):
-            #     if pygui.button("Exit"):
-            #         clib.stop
-            #     pygui.end()
+            if pygui.begin("SKINUX"):
+                if pygui.button("Exit"):
+                    running = False
+                pygui.end()

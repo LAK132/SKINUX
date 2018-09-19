@@ -19,13 +19,14 @@ using std::atomic_bool;
 #include "lak/pyexport.h"
 #include "lak/queue.h"
 #include "lak/ldebug.h"
+#include "pygui.h"
 
 #ifndef SKINUX_H
 #define SKINUX_H
 
 PY_EXPORT void init();
 
-PY_EXPORT void shutdown();
+PY_EXPORT void stop();
 
 //
 // opengl access control
