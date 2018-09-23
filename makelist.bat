@@ -8,7 +8,7 @@ set BINDIR=bin
 set LIBDIR=lib
 set LIBS=SDL2main.lib SDL2.lib
 
-set COMPOPT=/nologo /EHa /MD /MP /bigobj /W2
+set COMPOPT=/nologo /EHa /MD /bigobj /W2
 set LINKOPT=/nologo /DLL
 
 set DBGCOMPOPT=/Zi
@@ -23,6 +23,5 @@ set src_SRC=src
 set src_OBJ=skinux.cpp
 set src_INC=include include/SDL
 
-if not "%1"=="x64" if not "%1"=="x86" goto :eof
-
+if "%1"=="clean" goto :eof
 call vcvarsall.bat %1
