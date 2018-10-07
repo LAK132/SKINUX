@@ -1,59 +1,60 @@
-CXX = /usr/bin/g++-7
-
+CXX = /usr/bin/g++-7		#bat CXX = vcvarsall.bat
 CPPVER = c++14
 
-APP = libSkinux.so
+APP = libSkinux.so			#bat APP = libSkinux.dll
+COMPOPT = -ldl -pthread -fpic -lSDL2	#bat COMPOPT = /nologo /EHa /MD /bigobj /W2
+LINKOPT = -shared			#bat LINKOPT = /nologo /DLL
 
-COMPOPT = -ldl -pthread -fpic -lSDL2
-LINKOPT = -shared
-
-# APP = skinux.a
-
+# APP = skinux
 # COMPOPT = -ldl -pthread
 # LINKOPT =
 
 OUTDIR = out
 BINDIR = bin
-
 LIBDIR = lib
-LIBS =
+LIBS =						#bat LIBS = SDL2main.lib SDL2.lib
 
-DBGCOMPOPT =
-DBGLINKOPT =
+DBGCOMPOPT =				#bat DBGCOMPOPT = /Zi
+DBGLINKOPT =				#bat DBGLINKOPT = /DEBUG
 
-RELCOMPOPT =
-RELLINKOPT =
+RELCOMPOPT =				#bat RELCOMPOPT = /DNDEBUG
+RELLINKOPT =				#bat RELLINKOPT =
 
 SOURCES = src
 
 src_SRC = ./src
-src_OBJ = skinux.cpp 
-src_INC = include /usr/include/SDL2
+src_OBJ = skinux.cpp
+src_HDR = skinux.h
+src_DEP =
+src_INC = include /usr/include/SDL2		#bat src_INC = include include/SDL
 
-# -------------------
-# Start build script:
-# -------------------
-ALL_OBJ = $(foreach src,$(SOURCES),$(foreach obj,$($(src)_OBJ),$(BINDIR)/$(src)$(obj).o))
+# BUILD SCRIPT
 
-.PHONY: debug
-debug: $(foreach obj,$(ALL_OBJ),debug-$(obj))
-	$(call LINK_TEMPLATE,$(LINKOPT) $(DBGLINKOPT),debug)
+ALL_OBJ = $(foreach src,$(SOURCES),$(foreach obj,$($(src)_OBJ),$(src)$(obj).o))
+ALL_HDR = $(foreach src,$(SOURCES),$(foreach header,$($(src)_HDR),$($(src)_SRC)/$(header)))
 
-release: $(foreach obj,$(ALL_OBJ),release-$(obj))
-	$(call LINK_TEMPLATE,$(LINKOPT) $(RELLINKOPT),release)
+.PHONY: all
+all: release
 
-define LINK_TEMPLATE =
-$(CXX) -std=$(CPPVER) -o $(OUTDIR)/$(2)/$(APP) $(ALL_OBJ) $(foreach libdir,$(LIBDIR),-L$(libdir)) $(foreach lib,$(LIBS),-l$(lib)) $(COMPOPT) $(1)
-endef
+debug: $(BINDIR) $(OUTDIR) $(foreach obj,$(ALL_OBJ),$(BINDIR)/dbg$(obj))
+	$(CXX) -std=$(CPPVER) $(foreach obj,$(ALL_OBJ),$(BINDIR)/dbg$(obj)) $(foreach libdir,$(LIBDIR),-L$(libdir)) $(foreach lib,$(LIBS),-l$(lib)) $(COMPOPT) $(LINKOPT) $(DBGLINKOPT) -o $(OUTDIR)/$(APP)
+
+release: $(BINDIR) $(OUTDIR) $(foreach obj,$(ALL_OBJ),$(BINDIR)/rel$(obj))
+	$(CXX) -std=$(CPPVER) $(foreach obj,$(ALL_OBJ),$(BINDIR)/rel$(obj)) $(foreach libdir,$(LIBDIR),-L$(libdir)) $(foreach lib,$(LIBS),-l$(lib)) $(COMPOPT) $(LINKOPT) $(RELLINKOPT) -o $(OUTDIR)/$(APP)
+
+clean: $(BINDIR)
+	cd $(BINDIR) && rm -f *.o
+
+$(OUTDIR):
+	if [ ! -d $@ ]; then mkdir $@; fi
+$(BINDIR):
+	if [ ! -d $@ ]; then mkdir $@; fi
 
 define COMPILE_TEMPLATE =
-debug-$(2)$(3).o: $(1)/$(3)
-	$(CXX) -std=$(CPPVER) -c -o $(2)$(3).o $(1)/$(3) $(4) $(COMPOPT) $(DBGCOMPOPT)
-release-$(2)$(3).o: $(1)/$(3)
-	$(CXX) -std=$(CPPVER) -c -o $(2)$(3).o $(1)/$(3) $(4) $(COMPOPT) $(RELCOMPOPT)
+$(BINDIR)/dbg$(1)%.o: $(2)/% $(3)
+	$(CXX) -std=$(CPPVER) -c $(4) $(COMPOPT) $(DBGCOMPOPT) -o $$@ $$<
+$(BINDIR)/rel$(1)%.o: $(2)/% $(3)
+	$(CXX) -std=$(CPPVER) -c $(4) $(COMPOPT) $(RELCOMPOPT) -o $$@ $$<
 endef
 
-$(foreach src,$(SOURCES),$(foreach obj,$($(src)_OBJ),$(eval $(call COMPILE_TEMPLATE,$($(src)_SRC),$(BINDIR)/$(src),$(obj),$(foreach inc,$($(src)_INC),-I$(inc))))))
-
-clean:
-	rm -f $(ALL_OBJ)
+$(foreach src,$(SOURCES),$(eval $(call COMPILE_TEMPLATE,$(src),$($(src)_SRC),$(foreach header,$($(src)_HDR),$($(src)_SRC)/$(header)) $(foreach dep,$($(src)_DEP),$(foreach depobj,$($(dep)_OBJ),$($(dep)_SRC)/$(depobj)) $(foreach dephdr,$($(dep)_HDR),$($(dep)_SRC)/$(dephdr))),$(foreach inc,$($(src)_INC),-I$(inc)) $(foreach dep,$($(src)_DEP),-I$($(dep)_SRC)))))
